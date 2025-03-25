@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Text Encrypt/Decrypt</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.9/angular.min.js"></script>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        textarea {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body ng-app="devStack" ng-controller="textEncryptionController">
+
+<h1>Encrypt & Decrypt Text</h1>
+
+<h2>Encryption</h2>
+<textarea placeholder="Enter text to encrypt" ng-model="textEncryption.textToEncrypt"></textarea>
+<label><input type="checkbox" ng-model="encryptSecretKey"> Use custom secret key</label>
+<input type="text" placeholder="Secret Key" ng-model="textEncryption.secretKey" ng-disabled="!encryptSecretKey">
+<button ng-click="encryptText()">Encrypt</button>
+<textarea placeholder="Encrypted Output" ng-model="textEncryption.encryptedText" readonly></textarea>
+
+<h2>Decryption</h2>
+<textarea placeholder="Enter text to decrypt" ng-model="textEncryption.textToDecrypt"></textarea>
+<label><input type="checkbox" ng-model="dSecretKeyRequired"> Requires secret key</label>
+<input type="text" placeholder="Secret Key" ng-model="textEncryption.deSecretKey" ng-disabled="!dSecretKeyRequired">
+<button ng-click="decryptText()">Decrypt</button>
+<textarea placeholder="Decrypted Output" ng-model="textEncryption.decryptedText" readonly></textarea>
+
+<script>
+    var App = angular.module("devStack", []);
+    App.controller("textEncryptionController", ["$scope", function($scope) {
+        $scope.textEncryption = {
+            textToEncrypt: '',
+            encryptedText: '',
+            textToDecrypt: '',
+            decryptedText: '',
+            secretKey: '',
+            deSecretKey: ''
+        };
+
+        $scope.encryptText = function() {
+            let text = $scope.textEncryption.textToEncrypt;
+            let key = $scope.encryptSecretKey ? $scope.textEncryption.secretKey : 'defaultKey';
+            $scope.textEncryption.encryptedText = btoa(unescape(encodeURIComponent(text + key)));
+        };
+
+        $scope.decryptText = function() {
+            try {
+                let decrypted = decodeURIComponent(escape(atob($scope.textEncryption.textToDecrypt)));
+                let key = $scope.dSecretKeyRequired ? $scope.textEncryption.deSecretKey : 'defaultKey';
+                $scope.textEncryption.decryptedText = decrypted.replace(key, '');
+            } catch (e) {
+                $scope.textEncryption.decryptedText = "Invalid encryption format!";
+            }
+        };
+    }]);
+</script>
+
+</body>
+</html>
